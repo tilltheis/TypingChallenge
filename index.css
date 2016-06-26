@@ -1,0 +1,11 @@
+.active {
+  background: yellow;
+}
+
+.correct {
+  background: lightgreen;
+}
+
+.wrong {
+  background: salmon;
+}
