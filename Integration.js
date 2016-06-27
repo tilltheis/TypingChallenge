@@ -18,12 +18,12 @@ var startGame = function() {
 
   updateGameUi(currentChallenge);
 
-  solutionEl.onkeyup = function(event) {
-    currentChallenge = TypingChallenge.readWord(currentChallenge, event.target.value);
+  solutionEl.oninput = function(event) {
+    currentChallenge = TypingChallenge.readWord(currentChallenge, solutionEl.value);
     updateGameUi(currentChallenge);
   };
   currentGameTimeout = setTimeout(function() {
-    solutionEl.onkeyup = function() { return false; };
+    solutionEl.oninput = function() { return false; };
     clearInterval(currentStatsInterval);
 
     currentChallenge = TypingChallenge.stopChallenge(currentChallenge);
