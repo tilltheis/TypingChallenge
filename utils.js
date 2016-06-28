@@ -20,7 +20,20 @@ var utils = (function() {
     return words;
   };
 
+  var grouped = function(array, groupSize) {
+    var groups = [];
+    for (var i = 0; i < array.length; i += groupSize) {
+      var group = [];
+      for (var j = 0; j < groupSize && i + j < array.length; j++) {
+        group.push(array[i + j]);
+      }
+      groups.push(group);
+    }
+    return groups;
+  };
+
   return {
-    generateDictionary: generateDictionary
+    generateDictionary: generateDictionary,
+    grouped: grouped
   };
 }());
