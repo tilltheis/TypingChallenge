@@ -64,14 +64,14 @@
   };
 
   var updateStatsUi = function(challenge) {
-    var wpm = 60000 / GameDuration * (challenge.correctWordIndexes.length + challenge.incorrectWordIndexes.length);
     var timeLeft = Math.max(0, ((challenge.startDate * 1 + GameDuration) - (new Date() * 1)) / 1000);
+    var wpm = challenge.correctWordIndexes.length / (GameDuration / 1000 - timeLeft) * GameDuration / 1000;
     statsEl.innerHTML  = "<br><b>Stats<b>";
-    statsEl.innerHTML += "<br>WPM: " + wpm;
+    statsEl.innerHTML += "<br>WPM: " + Math.trunc(wpm);
     statsEl.innerHTML += "<br>key strokes: " + challenge.keyStrokeCount;
     statsEl.innerHTML += "<br>correct: "  + challenge.correctWordIndexes.length;
     statsEl.innerHTML += "<br>incorrect: " + challenge.incorrectWordIndexes.length;
-    statsEl.innerHTML += "<br>time left: " + timeLeft + "s";
+    statsEl.innerHTML += "<br>time left: " + Math.trunc(timeLeft);
   };
 
   restartEl.onclick = startGame;
