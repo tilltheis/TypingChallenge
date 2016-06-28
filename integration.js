@@ -11,6 +11,7 @@
   var currentStatsInterval = null; // set by startGame()
 
   var GameDuration = 60000;
+  var WordsPerLine = 13;
 
   var startGame = function() {
     clearTimeout(currentGameTimeout);
@@ -41,28 +42,36 @@
   };
 
   var updateGameUi = function(challenge) {
-    var wordEls = currentChallenge.words.map(function(word, index) {
-      var className = "";
-      if (index === challenge.currentWordIndex) { className += " active"; }
-      if (challenge.correctWordIndexes.indexOf(index) !== -1) { className += " correct"; }
-      if (challenge.incorrectWordIndexes.indexOf(index) !== -1) { className += " wrong"; }
-      return "<span class=\"" + className + "\">" + word + "</span>";
+    var allLines = utils.grouped(challenge.words, WordsPerLine);
+    var activeLineIndex = Math.trunc(challenge.currentWordIndex / WordsPerLine);
+    var visibleLines = allLines.slice(activeLineIndex, activeLineIndex + 2);
+
+    var htmlLines =  visibleLines.map(function(line, lineIndex) {
+      return line.map(function(word, wordIndex) {
+        var globalIndex = (activeLineIndex + lineIndex) * WordsPerLine + wordIndex;
+        var className = "";
+        if (globalIndex === challenge.currentWordIndex) { className += " active"; }
+        if (challenge.correctWordIndexes.indexOf(globalIndex) !== -1) { className += " correct"; }
+        if (challenge.incorrectWordIndexes.indexOf(globalIndex) !== -1) { className += " wrong"; }
+        return "<span class=\"" + className + "\">" + word + "</span>";
+      });
     });
-    problemEl.innerHTML = wordEls.join(" ");
+
+    problemEl.innerHTML = htmlLines.map(function(line) { return line.join(" "); }).join("<br>");
 
     solutionEl.value = challenge.input;
     solutionEl.disabled = !challenge.isRunning;
   };
 
   var updateStatsUi = function(challenge) {
-    var wpm = 60000 / GameDuration * (challenge.correctWordIndexes.length + challenge.incorrectWordIndexes.length);
     var timeLeft = Math.max(0, ((challenge.startDate * 1 + GameDuration) - (new Date() * 1)) / 1000);
+    var wpm = challenge.correctWordIndexes.length / (GameDuration / 1000 - timeLeft) * GameDuration / 1000;
     statsEl.innerHTML  = "<br><b>Stats<b>";
-    statsEl.innerHTML += "<br>WPM: " + wpm;
+    statsEl.innerHTML += "<br>WPM: " + Math.trunc(wpm);
     statsEl.innerHTML += "<br>key strokes: " + challenge.keyStrokeCount;
     statsEl.innerHTML += "<br>correct: "  + challenge.correctWordIndexes.length;
     statsEl.innerHTML += "<br>incorrect: " + challenge.incorrectWordIndexes.length;
-    statsEl.innerHTML += "<br>time left: " + timeLeft + "s";
+    statsEl.innerHTML += "<br>time left: " + Math.trunc(timeLeft);
   };
 
   restartEl.onclick = startGame;
