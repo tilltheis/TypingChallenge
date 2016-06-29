@@ -11,6 +11,23 @@
     <input id="solution">
     <button id="restart">Start New Game</button>
     <div id="stats"></div>
+
+    <template id="statsTemplate">
+      <h3>Stats</h3>
+      <dl>
+        <dt>Time Left</dt>
+        <dd>{{timeLeft}}</dd>
+        <dt>WPM</dt>
+        <dd>{{wpm}}</dd>
+        <dt>Key Strokes</dt>
+        <dd>{{keyStrokeCount}}</dd>
+        <dt>Correct Words</dt>
+        <dd>{{correctWordCount}}</dd>
+        <dt>Incorrect Words</dt>
+        <dd>{{incorrectWordCount}}</dd>
+      </dl>
+    </template>
+
     <script src="typingChallenge.js"></script>
     <script src="utils.js"></script>
     <script src="integration.js"></script>
