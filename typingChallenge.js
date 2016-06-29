@@ -1,22 +1,26 @@
 "use strict";
 
 var typingChallenge = (function() {
-  var startChallenge = function(words, startDate) {
+  var createChallenge = function(words) {
     return {
       words: words,
       correctWordIndexes: [],
       incorrectWordIndexes: [],
       currentWordIndex: 0,
-      startDate: startDate,
+      startDate: null,
       keyStrokeCount: 0,
       input: "",
-      isRunning: true
+      isRunning: false
     };
+  };
+
+  var startChallenge = function(challenge, startDate) {
+    return setProperties(challenge, { startDate: startDate, isRunning: true });
   };
 
   var stopChallenge = function(challenge) {
     return setProperties(challenge, { isRunning: false });
-  }
+  };
 
   var setProperties = function(oldChallenge, newProperties) {
     return Object.assign({}, oldChallenge, newProperties);
@@ -49,6 +53,7 @@ var typingChallenge = (function() {
   };
 
   return {
+    createChallenge: createChallenge,
     startChallenge: startChallenge,
     stopChallenge: stopChallenge,
     readWord: readWord
