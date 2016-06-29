@@ -32,8 +32,15 @@ var utils = (function() {
     return groups;
   };
 
+  var fillTemplate = function(template, context) {
+    return template.replace(/\{\{([a-z0-9_]+)\}\}/gi, function(match, key) {
+      return context[key];
+    });
+  };
+
   return {
     generateDictionary: generateDictionary,
-    grouped: grouped
+    grouped: grouped,
+    fillTemplate: fillTemplate
   };
 }());

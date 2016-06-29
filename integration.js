@@ -5,6 +5,7 @@
   var solutionEl = document.querySelector("#solution");
   var restartEl = document.querySelector("#restart");
   var statsEl = document.querySelector("#stats");
+  var statsTemplateEl = document.querySelector("#statsTemplate");
 
   var currentChallenge = null; // set by startGame()
   var currentGameTimeout = null; // set by startGame()
@@ -73,12 +74,13 @@
   var updateStatsUi = function(challenge) {
     var timeLeft = Math.max(0, ((challenge.startDate * 1 + GameDuration) - (new Date() * 1)) / 1000);
     var wpm = challenge.correctWordIndexes.length / (GameDuration / 1000 - timeLeft) * GameDuration / 1000;
-    statsEl.innerHTML  = "<br><b>Stats<b>";
-    statsEl.innerHTML += "<br>WPM: " + Math.trunc(wpm);
-    statsEl.innerHTML += "<br>key strokes: " + challenge.keyStrokeCount;
-    statsEl.innerHTML += "<br>correct: "  + challenge.correctWordIndexes.length;
-    statsEl.innerHTML += "<br>incorrect: " + challenge.incorrectWordIndexes.length;
-    statsEl.innerHTML += "<br>time left: " + Math.trunc(timeLeft);
+    statsEl.innerHTML = utils.fillTemplate(statsTemplate.innerHTML, {
+      timeLeft: Math.trunc(timeLeft),
+      wpm: Math.trunc(wpm),
+      keyStrokeCount: challenge.keyStrokeCount,
+      correctWordCount: challenge.correctWordIndexes.length,
+      incorrectWordCount: challenge.incorrectWordIndexes.length
+    });
   };
 
   restartEl.onclick = startGame;
