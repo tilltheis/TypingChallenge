@@ -1,11 +1,54 @@
-.active {
-  background: yellow;
+#problem {
+  transition: all 0.3s ease-out;
 }
 
-.correct {
-  background: lightgreen;
+#problemContainer {
+  overflow: hidden;
 }
 
-.wrong {
-  background: salmon;
+#problem div {
+  text-align: justify;
+}
+
+/* also justify last lines */
+#problem div:after {
+  content: "";
+  display: inline-block;
+  width: 100%;
+}
+
+#problem span {
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 1px;
+  font-size: 120%;
+}
+
+#problem .active {
+  background: #FCF8E3;
+  border-color: #FAEBCC;
+}
+
+#problem .correct {
+  background: #DFF0D8;
+  border-color: #D6E9C6;
+}
+
+#problem .incorrect {
+  background: #F2DEDE;
+  border-color: #EBCCD1;
+}
+
+
+.stat {
+  padding: 5px;
+}
+
+.stat-key {
+  font-weight: bold;
+}
+
+.stat-value {
+  text-align: right;
+  direction: rtl;
 }

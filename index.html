@@ -4,29 +4,76 @@
     <meta charset="utf-8" />
     <title>Typing Challenge</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
   </head>
   <body>
-    <h1>Typing Challenge</h1>
-    <div id="problem"></div>
-    <input id="solution">
-    <button id="restart">Start New Game</button>
-    <div id="stats"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+          <div class="page-header">
+            <h1>
+              Typing Challenge
+              <small>
+                <i class="fa fa-keyboard-o" aria-hidden="true"></i>
+                <i class="fa fa-trophy" aria-hidden="true"></i>
+              </small>
+            </h1>
+          </div>
+          <div id="problemContainer"><p id="problem" class="justify-stretch"></p></div>
+          <div class="row  class="form-group"">
+            <div class="col-md-8">
+              <input id="solution" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <button id="restart" class="form-control">Start New Game</button>
+            </div>
+          </div>
+          <div id="stats"></div>
 
-    <template id="statsTemplate">
-      <h3>Stats</h3>
-      <dl>
-        <dt>Time Left</dt>
-        <dd>{{timeLeft}}</dd>
-        <dt>WPM</dt>
-        <dd>{{wpm}}</dd>
-        <dt>Key Strokes</dt>
-        <dd>{{keyStrokeCount}}</dd>
-        <dt>Correct Words</dt>
-        <dd>{{correctWordCount}}</dd>
-        <dt>Incorrect Words</dt>
-        <dd>{{incorrectWordCount}}</dd>
-      </dl>
-    </template>
+          <template id="statsTemplate">
+            <p>
+              <div class="progress class="form-group">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{timeLeft}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:calc(100% / 60 * {{timeLeft}});">
+                  {{timeLeft:Math.trunc}}s
+                </div>
+              </div>
+            </p>
+
+            <div class="row">
+              <div class="col-md-3 stat">
+                <div class="row">
+                  <div class="col-md-8 stat-key">WPM</div>
+                  <div class="col-md-2 stat-value"><span class="badge">{{wpm:Math.trunc}}</span></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 stat">
+                <div class="row">
+                  <div class="col-md-8 stat-key">Key Strokes</div>
+                  <div class="col-md-2 stat-value"><span class="badge">{{keyStrokeCount}}</span></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 stat">
+                <div class="row">
+                  <div class="col-md-8 stat-key">Correct</div>
+                  <div class="col-md-2 stat-value"><span class="badge">{{correctWordCount}}</span></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 stat">
+                <div class="row">
+                  <div class="col-md-8 stat-key">Incorrect</div>
+                  <div class="col-md-2 stat-value"><span class="badge">{{incorrectWordCount}}</span></div>
+                </div>
+              </div>
+            </div>
+          </template>
+
+        </div>
+      </div>
+    </div>
 
     <script src="typingChallenge.js"></script>
     <script src="utils.js"></script>
