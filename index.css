@@ -1,23 +1,31 @@
 #problem {
-  transition: all 0.3s ease-out;
-}
-
-#problemContainer {
+  height: calc(43px * 2);
   overflow: hidden;
 }
 
-#problem div {
-  text-align: justify;
-}
-
 /* also justify last lines */
-#problem div:after {
+#problem .line:after {
   content: "";
   display: inline-block;
   width: 100%;
 }
 
-#problem span {
+#problem .line {
+  text-align: justify;
+  display: none;
+  height: 43px;
+}
+
+#problem .line.lastActiveLine, #problem .line.currentActiveLine, #problem .line.nextActiveLine {
+  display: block;
+}
+
+#problem .line.lastActiveLine  {
+  margin-top: -43px;
+  transition: all .3s ease-out;
+}
+
+#problem .word {
   border: 1px solid transparent;
   border-radius: 4px;
   padding: 1px;
