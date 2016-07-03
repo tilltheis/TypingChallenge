@@ -22,8 +22,37 @@ var typingChallenge = (function() {
     return setProperties(challenge, { isRunning: false });
   };
 
+  var Object_assign = (function() {
+    var assign = Object.assign;
+
+    // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
+    if (typeof assign != 'function') {
+      assign = function(target) {
+        'use strict';
+        if (target == null) {
+          throw new TypeError('Cannot convert undefined or null to object');
+        }
+
+        target = Object(target);
+        for (var index = 1; index < arguments.length; index++) {
+          var source = arguments[index];
+          if (source != null) {
+            for (var key in source) {
+              if (Object.prototype.hasOwnProperty.call(source, key)) {
+                target[key] = source[key];
+              }
+            }
+          }
+        }
+        return target;
+      };
+    }
+
+    return assign;
+  }());
+
   var setProperties = function(oldChallenge, newProperties) {
-    return Object.assign({}, oldChallenge, newProperties);
+    return Object_assign({}, oldChallenge, newProperties);
   };
 
   var readWord = function(oldChallenge, input) {

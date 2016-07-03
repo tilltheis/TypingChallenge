@@ -57,7 +57,7 @@
     var isAfterGameEnd = !challenge.isRunning && challenge.startDate !== null;
     var isNewLineReached = !isBeforeGameStart && lastWordIndex !== challenge.currentWordIndex && challenge.currentWordIndex % WordsPerLine === 0;
 
-    var currentActiveLineIndex = Math.trunc(challenge.currentWordIndex / WordsPerLine);
+    var currentActiveLineIndex = Math.floor(challenge.currentWordIndex / WordsPerLine);
 
     // create html once and mutate it afterwards to allow for fancy transitions
     if (isBeforeGameStart) {
@@ -86,17 +86,17 @@
     if (challenge.incorrectWordIndexes.length > 0) {
       document.querySelector(".word" + challenge.incorrectWordIndexes[challenge.incorrectWordIndexes.length - 1]).className += " incorrect";
     }
-    document.querySelectorAll(".active").forEach(function(el) { el.className.replace(/\bactive\b/, ""); });
+    [].forEach.call(document.querySelectorAll(".active"), function(el) { el.className.replace(/\bactive\b/, ""); });
     document.querySelector(".word" + challenge.currentWordIndex).className += " active";
 
     // highlight lines
     if (isNewLineReached || isBeforeGameStart) {
-      document.querySelectorAll(".currentActiveLine, .lastActiveLine, .nextActiveLine").forEach(function(el) {
+      [].forEach.call(document.querySelectorAll(".currentActiveLine, .lastActiveLine, .nextActiveLine"), function(el) {
         el.className.replace(/\bcurrentActiveLine\b/, "").replace(/\blastActiveLine\b/, "").replace(/\bnextActiveLine\b/, "");
       });
       document.querySelector(".line" + currentActiveLineIndex).className += " currentActiveLine";
-      document.querySelectorAll(".line" + (currentActiveLineIndex - 1)).forEach(function(el) { el.className += " lastActiveLine"; });
-      document.querySelectorAll(".line" + (currentActiveLineIndex + 1)).forEach(function(el) { el.className += " nextActiveLine"; });
+      [].forEach.call(document.querySelectorAll(".line" + (currentActiveLineIndex - 1)), function(el) { el.className += " lastActiveLine"; });
+      [].forEach.call(document.querySelectorAll(".line" + (currentActiveLineIndex + 1)), function(el) { el.className += " nextActiveLine"; });
     }
 
 
@@ -117,9 +117,13 @@
       wpm = challenge.correctWordIndexes.length / (GameDuration / 1000 - timeLeft) * GameDuration / 1000;
     }
 
+    // FF and IE don't support CSS calc() within hsl(), so we have to do it here...
+    var wpmHue = Math.min(120, Math.max(0, wpm - 25) / 75 * 120); // wpm<=25 is bad; wpm>=100 is good
+
     var context = {
       timeLeft: timeLeft,
       wpm: wpm,
+      wpmHue: wpmHue,
       keyStrokeCount: challenge.keyStrokeCount,
       correctWordCount: challenge.correctWordIndexes.length,
       incorrectWordCount: challenge.incorrectWordIndexes.length
