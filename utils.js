@@ -15,9 +15,10 @@ var utils = (function() {
   };
 
   var generateDictionary = function() {
-    var words = allWords.slice();
-    shuffleInPlace(words)
-    return words;
+    var fewWords = allWords.slice()
+    var manyWords = fewWords.concat(fewWords, fewWords, fewWords, fewWords, fewWords);
+    shuffleInPlace(manyWords)
+    return manyWords;
   };
 
   var grouped = function(array, groupSize) {

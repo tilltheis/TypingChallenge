@@ -80,12 +80,12 @@
 
 
     // highlight words
-    challenge.correctWordIndexes.forEach(function(index) {
-      document.querySelector(".word" + index).className += " correct";
-    });
-    challenge.incorrectWordIndexes.forEach(function(index) {
-      document.querySelector(".word" + index).className += " incorrect";
-    });
+    if (challenge.correctWordIndexes.length > 0) {
+      document.querySelector(".word" + challenge.correctWordIndexes[challenge.correctWordIndexes.length - 1]).className += " correct";
+    }
+    if (challenge.incorrectWordIndexes.length > 0) {
+      document.querySelector(".word" + challenge.incorrectWordIndexes[challenge.incorrectWordIndexes.length - 1]).className += " incorrect";
+    }
     document.querySelectorAll(".active").forEach(function(el) { el.className.replace(/\bactive\b/, ""); });
     document.querySelector(".word" + challenge.currentWordIndex).className += " active";
 
