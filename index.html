@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <style id="statsCss"></style>
+    <template id="statsCssTemplate">
+      #solution, #restart {
+        border-color: hsl({{wpmHue}}, 50%, 50%);
+      }
+
+      #solution:focus, #restart:focus {
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px hsla({{wpmHue}}, 50%, 50%, .6);
+      }
+
+      p div div, .progress-bar, .stat-value .badge {
+        background-color: hsl({{wpmHue}}, 50%, 50%);
+      }
+    </template>
   </head>
   <body>
     <div class="container">
@@ -21,8 +35,8 @@
               </small>
             </h1>
           </div>
-          <div id="problemContainer"><p id="problem" class="justify-stretch"></p></div>
-          <div class="row  class="form-group"">
+          <p id="problem"></p>
+          <div class="row form-group">
             <div class="col-md-8">
               <input id="solution" class="form-control">
             </div>
@@ -33,19 +47,17 @@
           <div id="stats"></div>
 
           <template id="statsTemplate">
-            <p>
-              <div class="progress class="form-group">
-                <div class="progress-bar" role="progressbar" aria-valuenow="{{timeLeft}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:calc(100% / 60 * {{timeLeft}});">
-                  {{timeLeft:Math.trunc}}s
-                </div>
+            <div class="progress form-group">
+              <div class="progress-bar" role="progressbar" aria-valuenow="{{timeLeft}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:calc(100% / 60 * {{timeLeft}});">
+                {{timeLeft:Math.floor}}s
               </div>
-            </p>
+            </div>
 
             <div class="row">
               <div class="col-md-3 stat">
                 <div class="row">
                   <div class="col-md-8 stat-key">WPM</div>
-                  <div class="col-md-2 stat-value"><span class="badge">{{wpm:Math.trunc}}</span></div>
+                  <div class="col-md-2 stat-value"><span class="badge">{{wpm:Math.floor}}</span></div>
                 </div>
               </div>
 

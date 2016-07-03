@@ -2,20 +2,17 @@
 
 (function() {
   var problemEl = document.querySelector("#problem");
-  var problemContainerEl = document.querySelector("#problemContainer");
   var solutionEl = document.querySelector("#solution");
   var restartEl = document.querySelector("#restart");
   var statsEl = document.querySelector("#stats");
   var statsTemplateEl = document.querySelector("#statsTemplate");
+  var statsCssEl = document.querySelector("#statsCss");
+  var statsCssTemplateEl = document.querySelector("#statsCssTemplate");
 
   var currentChallenge = null;
   var currentGameTimeout = null;
   var currentStatsInterval = null;
   var lastWordIndex = null;
-  var rowHeight = null;
-
-  var CorrectRgbColor = utils.stringToRgb("#97b57d");
-  var IncorrectRgbColor = utils.stringToRgb("#c6717e");
 
   var GameDuration = 60000;
   var WordsPerLine = 13;
@@ -58,43 +55,50 @@
   var updateGameUi = function(challenge) {
     var isBeforeGameStart = !challenge.isRunning && challenge.startDate === null;
     var isAfterGameEnd = !challenge.isRunning && challenge.startDate !== null;
+    var isNewLineReached = !isBeforeGameStart && lastWordIndex !== challenge.currentWordIndex && challenge.currentWordIndex % WordsPerLine === 0;
+
+    var currentActiveLineIndex = Math.floor(challenge.currentWordIndex / WordsPerLine);
 
     // create html once and mutate it afterwards to allow for fancy transitions
     if (isBeforeGameStart) {
-      lastWordIndex = null;
+      lastWordIndex = challenge.currentWordIndex - 1;
 
       var lines = utils.grouped(challenge.words, WordsPerLine);
       var htmlLines = lines.map(function(line, lineIndex) {
         return line.map(function(word, wordIndex) {
-          var id = "word" + (lineIndex * WordsPerLine + wordIndex);
-          return "<span id=\"" + id + "\">" + word + "</span>";
+          var globalIndex = lineIndex * WordsPerLine + wordIndex;
+          var className = "word word" + globalIndex;
+          return "<span class=\"" + className + "\">" + word + "</span>";
         });
       });
 
-      problemEl.innerHTML = "<div class=\"line\">" + htmlLines.map(function(line) { return line.join(" "); }).join("</div><div class=\"line\">") + "</div>";
-
-      rowHeight = problemEl.querySelector(".line").clientHeight; // to be able to scroll the lines
-      problemContainerEl.style.height = rowHeight * 2 + "px";
-      problemEl.style.marginTop = "";
+      problemEl.innerHTML = htmlLines.map(function(line, lineIndex) {
+        var className = "line line" + lineIndex;
+        return "<div class=\"" + className + "\">" + line.join(" ") + "</div>";
+      }).join("");
     }
 
-    // word hightlighting
-    challenge.correctWordIndexes.forEach(function(index) {
-      document.getElementById("word" + index).className += " correct";
-    });
-    challenge.incorrectWordIndexes.forEach(function(index) {
-      document.getElementById("word" + index).className += " incorrect";
-    });
-    if (lastWordIndex !== null) {
-      document.getElementById("word" + lastWordIndex).className.replace(/\bactive\b/,'');
-    };
-    document.getElementById("word" + challenge.currentWordIndex).className += " active";
 
-    // new line reached?
-    if (lastWordIndex !== null && lastWordIndex !== challenge.currentWordIndex && challenge.currentWordIndex % WordsPerLine === 0) {
-      var currentMarginTop = problemEl.style.marginTop === "" ? 0 : parseInt(problemEl.style.marginTop);
-      problemEl.style.marginTop = currentMarginTop - rowHeight + "px";
+    // highlight words
+    if (challenge.correctWordIndexes.length > 0) {
+      document.querySelector(".word" + challenge.correctWordIndexes[challenge.correctWordIndexes.length - 1]).className += " correct";
     }
+    if (challenge.incorrectWordIndexes.length > 0) {
+      document.querySelector(".word" + challenge.incorrectWordIndexes[challenge.incorrectWordIndexes.length - 1]).className += " incorrect";
+    }
+    [].forEach.call(document.querySelectorAll(".active"), function(el) { el.className.replace(/\bactive\b/, ""); });
+    document.querySelector(".word" + challenge.currentWordIndex).className += " active";
+
+    // highlight lines
+    if (isNewLineReached || isBeforeGameStart) {
+      [].forEach.call(document.querySelectorAll(".currentActiveLine, .lastActiveLine, .nextActiveLine"), function(el) {
+        el.className.replace(/\bcurrentActiveLine\b/, "").replace(/\blastActiveLine\b/, "").replace(/\bnextActiveLine\b/, "");
+      });
+      document.querySelector(".line" + currentActiveLineIndex).className += " currentActiveLine";
+      [].forEach.call(document.querySelectorAll(".line" + (currentActiveLineIndex - 1)), function(el) { el.className += " lastActiveLine"; });
+      [].forEach.call(document.querySelectorAll(".line" + (currentActiveLineIndex + 1)), function(el) { el.className += " nextActiveLine"; });
+    }
+
 
     solutionEl.value = challenge.input;
     solutionEl.disabled = isAfterGameEnd;
@@ -102,56 +106,6 @@
     if (lastWordIndex !== challenge.currentWordIndex) {
       lastWordIndex = challenge.currentWordIndex;
     }
-  };
-
-  // colorize ui according to the player's performance
-  var colorizeStats = function(wpm, isRunning) {
-
-    // more colorful
-    var color =
-      utils.hsvToRgb(
-        utils.hsvColorBetween(
-          utils.rgbToHsv(CorrectRgbColor),
-          utils.rgbToHsv(IncorrectRgbColor),
-          1 - Math.min(1, Math.max(0, wpm - 25) / 50) // <= 25wpm is bad ; >= 75 is good
-        )
-      );
-
-    // less colorful
-    // var color =
-    //   utils.rbgColorBetween(
-    //     CorrectRgbColor,
-    //     IncorrectRgbColor,
-    //     1 - Math.min(1, Math.max(0, wpm - 25) / 50) // <= 25wpm is bad ; >= 75 is good
-    //   );
-
-    var colorfulStats = document.querySelectorAll("p div div, .progress-bar, .stat-value .badge");
-    [].forEach.call(colorfulStats, function(el) {
-      el.style.backgroundColor = "#" + color.r.toString(16) + color.g.toString(16) + color.b.toString(16);
-    });
-
-    var colorfulInputs = document.querySelectorAll("#solution, #restart"); // :focus pseudo class has no effect here
-    [].forEach.call(colorfulInputs, function(el) {
-      el.style.borderColor = "#" + color.r.toString(16) + color.g.toString(16) + color.b.toString(16);
-
-      // complex because we need to handle state w/ and w/o focus manually
-      if (isRunning) {
-        el.onfocus = undefined;
-        el.onblur = undefined;
-        if (el === document.activeElement) {
-          el.style.boxShadow = "inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(" + color.r + ", " + color.g + ", " + color.b + ", .6)";
-        } else {
-          el.style.boxShadow = "";
-        }
-      } else {
-        el.onfocus = function() {
-          el.style.boxShadow = "inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(" + color.r + ", " + color.g + ", " + color.b + ", .6)";
-        };
-        el.onblur = function() {
-          el.style.boxShadow = "";
-        }
-      }
-    });
   };
 
   var updateStatsUi = function(challenge) {
@@ -163,15 +117,19 @@
       wpm = challenge.correctWordIndexes.length / (GameDuration / 1000 - timeLeft) * GameDuration / 1000;
     }
 
-    statsEl.innerHTML = utils.fillTemplate(statsTemplate.innerHTML, {
+    // FF and IE don't support CSS calc() within hsl(), so we have to do it here...
+    var wpmHue = Math.min(120, Math.max(0, wpm - 25) / 75 * 120); // wpm<=25 is bad; wpm>=100 is good
+
+    var context = {
       timeLeft: timeLeft,
       wpm: wpm,
+      wpmHue: wpmHue,
       keyStrokeCount: challenge.keyStrokeCount,
       correctWordCount: challenge.correctWordIndexes.length,
       incorrectWordCount: challenge.incorrectWordIndexes.length
-    });
-
-    colorizeStats(wpm, challenge.isRunning);
+    };
+    statsEl.innerHTML = utils.fillTemplate(statsTemplate.innerHTML, context);
+    statsCssEl.innerHTML = utils.fillTemplate(statsCssTemplate.innerHTML, context);
   };
 
   restartEl.onclick = startGame;
