@@ -8,7 +8,8 @@ var typingChallenge = (function() {
       incorrectWordIndexes: [],
       currentWordIndex: 0,
       startDate: null,
-      keyStrokeCount: 0,
+      correctKeyStrokeCount: 0,
+      incorrectKeyStrokeCount: 0,
       input: "",
       isRunning: false
     };
@@ -59,18 +60,24 @@ var typingChallenge = (function() {
     var newChallenge = null;
 
     if (input !== "" && input.charAt(input.length - 1) === " ") {
-      var op = oldChallenge;
-      var isCorrect = input.substring(0, input.length - 1) === op.words[op.currentWordIndex];
-      var newCorrectWordIndexes = isCorrect ? op.correctWordIndexes.concat([op.currentWordIndex]) : op.correctWordIndexes;
-      var newincorrectWordIndexes = !isCorrect ? op.incorrectWordIndexes.concat([op.currentWordIndex]) : op.incorrectWordIndexes;
+      var isCorrect = input.substring(0, input.length - 1) === oldChallenge.words[oldChallenge.currentWordIndex];
 
-      newChallenge = setProperties(oldChallenge, {
-        correctWordIndexes: newCorrectWordIndexes,
-        incorrectWordIndexes: newincorrectWordIndexes,
+      var tmpChallenge = setProperties(oldChallenge, {
         currentWordIndex: oldChallenge.currentWordIndex + 1,
-        keyStrokeCount: oldChallenge.keyStrokeCount + 1,
         input: ""
       });
+
+      if (isCorrect) {
+        newChallenge = setProperties(tmpChallenge, {
+          correctWordIndexes: oldChallenge.correctWordIndexes.concat([oldChallenge.currentWordIndex]),
+          correctKeyStrokeCount: oldChallenge.correctKeyStrokeCount + input.length
+        });
+      } else {
+        newChallenge = setProperties(tmpChallenge, {
+          incorrectWordIndexes: oldChallenge.incorrectWordIndexes.concat([oldChallenge.currentWordIndex]),
+          incorrectKeyStrokeCount: oldChallenge.incorrectKeyStrokeCount + input.length
+        });
+      }
     } else {
       newChallenge = setProperties(oldChallenge, {
         keyStrokeCount: oldChallenge.keyStrokeCount + 1,

@@ -16,6 +16,7 @@
 
   var GameDuration = 60000;
   var WordsPerLine = 13;
+  var AverageWordLength = 5;
 
   var startGame = function() {
     clearTimeout(currentGameTimeout);
@@ -114,7 +115,7 @@
 
     if (challenge.startDate !== null) {
       timeLeft = Math.max(0, ((challenge.startDate * 1 + GameDuration) - (new Date() * 1)) / 1000);
-      wpm = challenge.correctWordIndexes.length / (GameDuration / 1000 - timeLeft) * GameDuration / 1000;
+      wpm = (challenge.correctKeyStrokeCount / AverageWordLength) * ((GameDuration / 1000) / (GameDuration / 1000 - timeLeft));
     }
 
     // FF and IE don't support CSS calc() within hsl(), so we have to do it here...
@@ -124,7 +125,9 @@
       timeLeft: timeLeft,
       wpm: wpm,
       wpmHue: wpmHue,
-      keyStrokeCount: challenge.keyStrokeCount,
+      keyStrokeCount: challenge.correctKeyStrokeCount + challenge.incorrectKeyStrokeCount,
+      correctKeyStrokeCount: challenge.correctKeyStrokeCount,
+      incorrectKeyStrokeCount: challenge.incorrectKeyStrokeCount,
       correctWordCount: challenge.correctWordIndexes.length,
       incorrectWordCount: challenge.incorrectWordIndexes.length
     };
