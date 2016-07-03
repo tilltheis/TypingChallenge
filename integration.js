@@ -119,7 +119,7 @@
     }
 
     // FF and IE don't support CSS calc() within hsl(), so we have to do it here...
-    var wpmHue = Math.min(120, Math.max(0, wpm - 25) / 75 * 120); // wpm<=25 is bad; wpm>=100 is good
+    var wpmHue = Math.min(120, Math.max(0, wpm - 50) / 65 * 120); // wpm<=50 is bad; wpm>=110 is good
 
     var context = {
       timeLeft: timeLeft,
