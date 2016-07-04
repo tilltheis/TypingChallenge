@@ -20,6 +20,11 @@
       p div div, .progress-bar, .stat-value .badge {
         background-color: hsl({{wpmHue}}, 60%, 50%);
       }
+
+      #timeLeftBar {
+        min-width: 2em;
+        width: calc(100% / 60 * {{timeLeft}});
+      }
     </template>
   </head>
   <body>
@@ -48,7 +53,7 @@
 
           <template id="statsTemplate">
             <div class="progress form-group">
-              <div class="progress-bar" role="progressbar" aria-valuenow="{{timeLeft}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:calc(100% / 60 * {{timeLeft}});">
+              <div id="timeLeftBar" class="progress-bar" role="progressbar" aria-valuenow="{{timeLeft}}" aria-valuemin="0" aria-valuemax="100">
                 {{timeLeft:Math.floor}}s
               </div>
             </div>
