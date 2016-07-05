@@ -53,22 +53,32 @@
     solutionEl.focus();
   };
 
+  var layoutLines = function(words) {
+    var oldInnerHtml = problemEl.innerHTML;
+    problemEl.innerHTML = "<div class=\"line\" style=\"display:block;\">" + words.map(function(word, wordIndex) {
+      return "<span class=\"word\" style=\"display:inline-block;\">" + word + "</span>";
+    }).join(" ") + "</div>";
+    var nodeLines = utils.objectValues(utils.groupBy([].slice.call(problemEl.querySelectorAll(".word")), 'offsetTop'));
+    var wordLines = nodeLines.map(function(els) { return els.map(function(el) { return el.innerText; }); });
+    problemEl.innerHTML = oldInnerHtml;
+    return wordLines;
+  };
+
   var updateGameUi = function(challenge) {
     var isBeforeGameStart = !challenge.isRunning && challenge.startDate === null;
     var isAfterGameEnd = !challenge.isRunning && challenge.startDate !== null;
-    var isNewLineReached = !isBeforeGameStart && lastWordIndex !== challenge.currentWordIndex && challenge.currentWordIndex % WordsPerLine === 0;
-
-    var currentActiveLineIndex = Math.floor(challenge.currentWordIndex / WordsPerLine);
 
     // create html once and mutate it afterwards to allow for fancy transitions
     if (isBeforeGameStart) {
       lastWordIndex = challenge.currentWordIndex - 1;
 
-      var lines = utils.grouped(challenge.words, WordsPerLine);
-      var htmlLines = lines.map(function(line, lineIndex) {
-        return line.map(function(word, wordIndex) {
-          var globalIndex = lineIndex * WordsPerLine + wordIndex;
-          var className = "word word" + globalIndex;
+      var lines = layoutLines(challenge.words);
+      var tmpGlobalWordIndex = 0;
+      var htmlLines = lines.map(function(line) {
+        return line.map(function(word) {
+          var wordIndex = tmpGlobalWordIndex;
+          tmpGlobalWordIndex = tmpGlobalWordIndex + 1;
+          var className = "word word" + wordIndex;
           return "<span class=\"" + className + "\">" + word + "</span>";
         });
       });
@@ -78,6 +88,12 @@
         return "<div class=\"" + className + "\">" + line.join(" ") + "</div>";
       }).join("");
     }
+
+    var lineIndexForWordIndex = function(wordIndex) {
+      return parseInt(problemEl.querySelector(".word" + wordIndex).parentElement.className.match(/line(\d+)/)[1]);
+    };
+    var currentActiveLineIndex = lineIndexForWordIndex(challenge.currentWordIndex)
+    var isNewLineReached = !isBeforeGameStart && lineIndexForWordIndex(lastWordIndex) !== currentActiveLineIndex
 
 
     // highlight words
@@ -92,11 +108,13 @@
 
     // highlight lines
     if (isNewLineReached || isBeforeGameStart) {
+      if (isBeforeGameStart) {
+        document.querySelector(".line0").className += " nextActiveLine";
+      }
+
       [].forEach.call(document.querySelectorAll(".currentActiveLine, .lastActiveLine, .nextActiveLine"), function(el) {
-        el.className.replace(/\bcurrentActiveLine\b/, "").replace(/\blastActiveLine\b/, "").replace(/\bnextActiveLine\b/, "");
+        el.className = el.className.replace(/\blastActiveLine\b/g, "").replace(/\bcurrentActiveLine\b/g, "lastActiveLine").replace(/\bnextActiveLine\b/g, "currentActiveLine");
       });
-      document.querySelector(".line" + currentActiveLineIndex).className += " currentActiveLine";
-      [].forEach.call(document.querySelectorAll(".line" + (currentActiveLineIndex - 1)), function(el) { el.className += " lastActiveLine"; });
       [].forEach.call(document.querySelectorAll(".line" + (currentActiveLineIndex + 1)), function(el) { el.className += " nextActiveLine"; });
     }
 
