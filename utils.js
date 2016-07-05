@@ -21,18 +21,6 @@ var utils = (function() {
     return manyWords;
   };
 
-  var grouped = function(array, groupSize) {
-    var groups = [];
-    for (var i = 0; i < array.length; i += groupSize) {
-      var group = [];
-      for (var j = 0; j < groupSize && i + j < array.length; j++) {
-        group.push(array[i + j]);
-      }
-      groups.push(group);
-    }
-    return groups;
-  };
-
   // fills templates like `foo {{foo:bar.baz}} bar` where everything after the `:` is an optional path to a function, like `Math.trunc`.
   var fillTemplate = function(template, context) {
     return template.replace(/\{\{([a-z0-9_]+):?([a-z0-9_.]+)?\}\}/gi, function(match, key, formatterPath) {
@@ -49,9 +37,29 @@ var utils = (function() {
     });
   };
 
+  // from http://stackoverflow.com/a/34890276
+  var groupBy = function(xs, key) {
+    return xs.reduce(function(rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+
+  var objectValues = function(object) {
+    var values = [];
+    for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+        values.push(object[key]);
+      }
+    }
+    return values;
+  };
+
+
   return {
     generateDictionary: generateDictionary,
-    grouped: grouped,
+    groupBy: groupBy,
+    objectValues: objectValues,
     fillTemplate: fillTemplate
   };
 }());
